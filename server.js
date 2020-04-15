@@ -52,33 +52,48 @@ function employeeSearch() {
         })
 }
 function viewEmployee() {
-    var query = "SELECT employees.id AS id, employees.firstname, employees.lastname, manager.firstname AS manager,roles.title AS title, roles.salary AS salary, departments.department AS department,manager.firstname AS manager FROM employees JOIN roles ON employees.role_id = roles.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id JOIN departments ON roles.department_id = departments.id ORDER BY employees.id"
+    const query = "SELECT employees.id AS id, employees.firstname, employees.lastname, manager.firstname AS manager,roles.title AS title, roles.salary AS salary, departments.department AS department,manager.firstname AS manager FROM employees JOIN roles ON employees.role_id = roles.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id JOIN departments ON roles.department_id = departments.id ORDER BY employees.id"
     connection.query(query, function (err, res) {
         for (var i = 0; i < res.length; i++) {
             console.log("id: " + res[i].id +
                 "|| First name: " + res[i].firstname +
                 "|| last name: " + res[i].lastname +
                 "|| Role:" + res[i].title +
-                "|| Department:" + res[i].department+
+                "|| Department:" + res[i].department +
                 "|| Salary:" + res[i].salary +
                 "|| Manager:" + res[i].manager)
         }
         employeeSearch();
     });
-} 
-// function viewEmployeeByDep(){
-//     inquirer.prompt({
-//         type: "list",
-//         name: "departmentNames",
-//         message: "What Department would you like to view?",
-//         choices: [
-//             "Executive",
-//             "Development",
-//             "operations",
-//             "exit"
-//         ]
-//     })
-//     .then
+}
 
-    
-// }
+function viewEmployeeByDep() {
+    inquirer.prompt({
+        type: "list",
+        name: "departmentNames",
+        message: "What Department would you like to view?",
+        choices: [
+            "Executive",
+            "Development",
+            "Operations"
+        ]
+    })
+
+        .then(function (answer) {
+            const query = "SELECT employees.id AS id, employees.firstname, employees.lastname, manager.firstname AS manager,roles.title AS title, roles.salary AS salary, departments.department AS department,manager.firstname AS manager FROM employees JOIN roles ON employees.role_id = roles.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id JOIN departments ON roles.department_id = departments.id WHERE ? ORDER BY employees.id"
+            connection.query(query, { department: answer.departmentNames }, function (err, res) {
+                for (var i = 0; i < res.length; i++) {
+                    console.log("id: " + res[i].id +
+                        "|| First name: " + res[i].firstname +
+                        "|| last name: " + res[i].lastname +
+                        "|| Role:" + res[i].title +
+                        "|| Department:" + res[i].department +
+                        "|| Salary:" + res[i].salary +
+                        "|| Manager:" + res[i].manager)
+                }
+                employeeSearch();
+            });
+
+        });
+
+}

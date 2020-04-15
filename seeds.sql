@@ -27,3 +27,11 @@ JOIN roles ON employees.role_id = roles.id
 LEFT JOIN employees AS manager ON employees.manager_id = manager.id
 JOIN departments ON roles.department_id = departments.id
 ORDER BY employees.id;
+
+SELECT employees.id AS id, employees.firstname, employees.lastname, manager.firstname AS manager,roles.title AS title,roles.salary AS salary, departments.department AS department,manager.firstname AS manager
+FROM employees
+JOIN roles ON employees.role_id = roles.id
+LEFT JOIN employees AS manager ON employees.manager_id = manager.id
+JOIN departments ON roles.department_id = departments.id
+where departments.department = "Executive"
+ORDER BY employees.id;
