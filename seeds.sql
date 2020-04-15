@@ -35,3 +35,9 @@ LEFT JOIN employees AS manager ON employees.manager_id = manager.id
 JOIN departments ON roles.department_id = departments.id
 where departments.department = "Executive"
 ORDER BY employees.id;
+
+INSERT INTO employees set firstname = "Ashton" , lastname = "waters", role_id = 3,manager_id = 2
+
+
+-- View all roles
+SELECT title from roles

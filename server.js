@@ -27,6 +27,8 @@ function employeeSearch() {
             "View All Employees",
             "View All Employees by Department",
             "add Employee",
+            "add Department",
+            "add Role",
             "View All roles",
             "exit"
         ]
@@ -39,12 +41,18 @@ function employeeSearch() {
                 case "View All Employees by Department":
                     viewEmployeeByDep();
                     break;
-                // case "add Employee":
-                //     addEmployee();
+                case "add Employee":
+                    addEmployee();
+                    break;
+                // case "add department:
+                //     addDepartment();
                 //     break;
-                // case "View All roles":
-                //     viewAllRoles();
+                // case "add role":
+                //     addRole();
                 //     break;
+                case "View All roles":
+                    viewAllRoles();
+                    break;
                 case "exit":
                     connection.end();
                     break;
@@ -97,3 +105,58 @@ function viewEmployeeByDep() {
         });
 
 }
+
+function addEmployee() {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "firstName",
+          message: "What's the first name of the employee?"
+        },
+        {
+          type: "input",
+          name: "lastName",
+          message: "What's the last name of the employee?"
+        },
+        {
+          type: "input",
+          name: "roleID",
+          message: "What is the employee's role id?"
+        },
+        {
+          type: "input",
+          name: "managerID",
+          message: "What is the manager's id"
+        }
+      ])
+    .then (function(answer){
+const query = "INSERT INTO employees SET ?"
+connection.query(query,
+    {firstname:answer.firstName,
+     lastName:answer.lastName,
+     role_id: answer.roleID,
+     manager_id:answer.managerID}
+    ,function(err,res)
+{
+    if (err)
+    throw err;
+})
+employeeSearch()
+    })
+}
+
+
+
+
+
+function viewAllRoles() {
+    const query = "SELECT title From roles"
+    connection.query(query, function (err, res) {
+        for (var i = 0; i < res.length; i++) {
+            console.log("roles: " + res[i].title)
+        }
+        employeeSearch();
+    });
+}
+
