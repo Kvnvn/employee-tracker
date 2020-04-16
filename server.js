@@ -27,8 +27,9 @@ function employeeSearch() {
             "View All Employees",
             "View All Employees by Department",
             "add Employee",
-            "add Department",
             "add Role",
+            "add Department",
+            "update employee",
             "View All roles",
             "exit"
         ]
@@ -44,12 +45,15 @@ function employeeSearch() {
                 case "add Employee":
                     addEmployee();
                     break;
-                    case "add Role":
-                        addRole();
-                        break;
-                        case "add Department":
-                            addDepartment();
-                            break;
+                case "add Role":
+                    addRole();
+                    break;
+                case "add Department":
+                    addDepartment();
+                    break;
+                case "update employee":
+                 updateEmployee();
+                 break;
                 case "View All roles":
                     viewAllRoles();
                     break;
@@ -109,79 +113,122 @@ function viewEmployeeByDep() {
 
 function addEmployee() {
     connection.query("SELECT id, title FROM roles", (err, roles) => {
-      if (err) {
-        throw err;
-      }
-      const roleTitles= roles.map((row) => row.title);
-      connection.query("SELECT id, firstname, lastname FROM employees", (err, employees) => {
         if (err) {
-          throw err;
+            throw err;
         }
-        const employeeInfo = employees.map((row) => `${row.firstname} ${row.lastname}`);
-        return inquirer
-          .prompt([
-            {
-              type: "input",
-              message: "What is the employee's first name?",
-              name: "newFirstName"
-            },
-            {
-              type: "input",
-              message: "What is your employee's last name?",
-              name: "newLastName"
-            },
-            {
-              type: "list",
-              message: "What is the employee's role?",
-              name: "newRole",
-              choices: roleTitles 
-            },
-            {
-              type: "list",
-              message: "Who is the employee's manager?",
-              name: "newManager",
-              choices: employeeInfo
+        const roleTitles = roles.map((row) => row.title);
+        connection.query("SELECT id, firstname, lastname FROM employees", (err, employees) => {
+            if (err) {
+                throw err;
             }
-          ])
-          .then((answer) => {
-            const managerChoice = employees.find(
-              (row) => `${row.firstname} ${row.lastname}` === answer.newManager
-            );  
-             const roleChoice =roles.find((row)=>row.title===answer.newRole)
-            connection.query(
-              "INSERT INTO employees SET ?",
-              {
-                firstname: answer.newFirstName,
-                lastname: answer.newLastName,
-                role_id: roleChoice.id,
-                manager_id: managerChoice.id
-              },
-              (err, res) => {
-                if (err) throw err;
-              })
-            employeeSearch();
-          })
-      });
+            const employeeInfo = employees.map((row) => `${row.firstname} ${row.lastname}`);
+            return inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        message: "What is the employee's first name?",
+                        name: "newFirstName"
+                    },
+                    {
+                        type: "input",
+                        message: "What is your employee's last name?",
+                        name: "newLastName"
+                    },
+                    {
+                        type: "list",
+                        message: "What is the employee's role?",
+                        name: "newRole",
+                        choices: roleTitles
+                    },
+                    {
+                        type: "list",
+                        message: "Who is the employee's manager?",
+                        name: "newManager",
+                        choices: employeeInfo
+                    }
+                ])
+                .then((answer) => {
+                    const managerChoice = employees.find(
+                        (row) => `${row.firstname} ${row.lastname}` === answer.newManager
+                    );
+                    const roleChoice = roles.find((row) => row.title === answer.newRole)
+                    connection.query(
+                        "INSERT INTO employees SET ?",
+                        {
+                            firstname: answer.newFirstName,
+                            lastname: answer.newLastName,
+                            role_id: roleChoice.id,
+                            manager_id: managerChoice.id
+                        },
+                        (err, res) => {
+                            if (err) throw err;
+                        })
+                    employeeSearch();
+                })
+        });
     });
-  };
+};
 
-
-  function addDepartment() {
+function addRole() {
+    connection.query("SELECT id, department FROM departments", (err, departments) => {
+        if (err) {
+            throw err;
+        }
+        const depNames = departments.map((row) => row.department);
+        return inquirer
+            .prompt([
+                {
+                    type: "input",
+                    message: "What is the title of newly added role?",
+                    name: "newTitle"
+                },
+                {
+                    type: "input",
+                    message: "What is salary expectancy when working?",
+                    name: "newSalary"
+                },
+                {
+                    type: "list",
+                    message: "What department is this role being transferred to?",
+                    name: "newDep",
+                    choices: depNames
+                },
+            ])
+            .then((answer) => {
+                const roleChoice = departments.find(
+                    (row) => row.department === answer.newDep
+                );
+                connection.query(
+                    "INSERT INTO roles SET ?",
+                    {
+                        title: answer.newTitle,
+                        salary: answer.newSalary,
+                        department_id: roleChoice.id
+                    },
+                    (err, res) => {
+                        if (err) throw err;
+                    })
+                employeeSearch();
+            })
+    });
+};
+function addDepartment() {
     inquirer
-      .prompt({
-        name: "department",
-        type: "input",
-        message: "What would you like to input into departments?"
-      }).then((answer) => {
-        connection.query(
-          "INSERT INTO departments SET ?",
-          { department: answer.department },
-          (err, res) => {
-            if (err) throw err;
-          })
-        employeeSearch();
-      });
-  };
+        .prompt({
+            name: "department",
+            type: "input",
+            message: "What would you like to input into departments?"
+        }).then((answer) => {
+            connection.query(
+                "INSERT INTO departments SET ?",
+                { department: answer.department },
+                (err, res) => {
+                    if (err) throw err;
+                })
+            employeeSearch();
+        });
+};
+
 
 function viewAllRoles() {
     const query = "SELECT title From roles"
