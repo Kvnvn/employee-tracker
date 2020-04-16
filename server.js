@@ -44,12 +44,12 @@ function employeeSearch() {
                 case "add Employee":
                     addEmployee();
                     break;
-                // case "add department:
-                //     addDepartment();
-                //     break;
-                case "add role":
-                    addRole();
-                    break;
+                    case "add Role":
+                        addRole();
+                        break;
+                        case "add Department":
+                            addDepartment();
+                            break;
                 case "View All roles":
                     viewAllRoles();
                     break;
@@ -164,7 +164,24 @@ function addEmployee() {
       });
     });
   };
- 
+
+
+  function addDepartment() {
+    inquirer
+      .prompt({
+        name: "department",
+        type: "input",
+        message: "What would you like to input into departments?"
+      }).then((answer) => {
+        connection.query(
+          "INSERT INTO departments SET ?",
+          { department: answer.department },
+          (err, res) => {
+            if (err) throw err;
+          })
+        employeeSearch();
+      });
+  };
 
 function viewAllRoles() {
     const query = "SELECT title From roles"
