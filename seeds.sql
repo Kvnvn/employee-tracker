@@ -36,8 +36,25 @@ JOIN departments ON roles.department_id = departments.id
 where departments.department = "Executive"
 ORDER BY employees.id;
 
-INSERT INTO employees set firstname = "Ashton" , lastname = "waters", role_id = 3,manager_id = 2
 
-
+--add employees
+SELECT id, firstname, lastname FROM employees
+SELECT id, title FROM roles
+INSERT INTO employees SET ?
+--add department
+INSERT INTO departments SET ?
+--add roles
+SELECT id, department FROM departments
+INSERT INTO roles SET ?
 -- View all roles
 SELECT title from roles
+--view employee by dept
+SELECT employees.id AS id, employees.firstname, employees.lastname, manager.firstname AS manager,roles.title AS title, roles.salary AS salary, departments.department AS department,manager.firstname AS manager FROM employees JOIN roles ON employees.role_id = roles.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id JOIN departments ON roles.department_id = departments.id WHERE ? ORDER BY employees.id
+--view employee 
+SELECT employees.id AS id, employees.firstname, employees.lastname, manager.firstname AS manager,roles.title AS title, roles.salary AS salary, departments.department AS department,manager.firstname AS manager FROM employees JOIN roles ON employees.role_id = roles.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id JOIN departments ON roles.department_id = departments.id ORDER BY employees.id
+--view department
+SELECT department FROM departments
+
+--update employee
+SELECT id, title FROM roles
+SELECT id, firstname, lastname FROM employees
