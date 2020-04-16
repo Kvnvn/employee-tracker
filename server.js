@@ -31,6 +31,7 @@ function employeeSearch() {
             "add Department",
             "update employee",
             "View All roles",
+            "view Departments",
             "exit"
         ]
     })
@@ -52,10 +53,13 @@ function employeeSearch() {
                     addDepartment();
                     break;
                 case "update employee":
-                 updateEmployee();
-                 break;
+                    updateEmployee();
+                    break;
                 case "View All roles":
                     viewAllRoles();
+                    break;
+                case "view Departments":
+                    viewDepartments();
                     break;
                 case "exit":
                     connection.end();
@@ -217,7 +221,7 @@ function addDepartment() {
         .prompt({
             name: "department",
             type: "input",
-            message: "What would you like to input into departments?"
+            message: "What other department would you like to add into departments?"
         }).then((answer) => {
             connection.query(
                 "INSERT INTO departments SET ?",
@@ -229,6 +233,54 @@ function addDepartment() {
         });
 };
 
+function updateEmployee() {
+    connection.query("SELECT id, title FROM roles", (err, roles) => {
+        if (err) {
+            throw err;
+        }
+        const rolesInfo = roles.map((row) => row.title);
+        connection.query("SELECT id, firstname, lastname FROM employees", (err, employees) => {
+            if (err) {
+                throw err;
+            }
+            const employeeInfo = employees.map((row) => `${row.firstname} ${row.lastname}`);
+            return inquirer
+                .prompt(
+                    [{
+                        name: "updateEmployee",
+                        type: "list",
+                        message: "Which employee would you like to give an update change to?",
+                        choices: employeeInfo
+                    },
+                    {
+                        name: "updateRole",
+                        type: "list",
+                        message: "Which role do you want to set for the selected employee?",
+                        choices: rolesInfo
+                    }]).then((answer) => {
+                        const employeeChoice = employees.find(
+                            (row) => `${row.firstname} ${row.lastname}` === answer.updateEmployee
+                        );
+                        const roleChoice = roles.find(
+                            (row) => row.title === answer.updateRole
+                        );
+                        connection.query(
+                            "UPDATE employees SET ? WHERE ?",
+                            [{
+                                role_id: roleChoice.id
+                            },
+                            {
+                                id: employeeChoice.id
+                            }],
+                            (err, res) => {
+                                if (err) throw err;
+                            })
+                        employeeSearch();
+                    }
+                    );
+        });
+    });
+}
 
 function viewAllRoles() {
     const query = "SELECT title From roles"
@@ -239,4 +291,16 @@ function viewAllRoles() {
         employeeSearch();
     });
 }
+
+function viewDepartments() {
+    connection.query("SELECT department FROM departments",
+        (err, res) => {
+            for (let i = 0; i < res.length; i++) {
+                console.log(
+                    res[i].department
+                );
+            }
+            employeeSearch();
+        });
+};
 
